@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log In</title>
+</head>
+<body>
+
+{{if .UserName}}
+<h1>You are logged in</h1>
+USER NAME {{.UserName}}<br>
+PASSWORD {{.Password}}<br>
+FIRST {{.First}}<br>
+LAST {{.Last}}<br>
+{{else}}
+<h1>LOGIN</h1>
+
+<div>
+    {{.}}
+</div>
+
+<form method="post">
+    <input type="text" name="username" placeholder="email" required>
+    <input type="password" name="password" placeholder="password" required>
+    <input type="submit">
+</form>
+{{end}}
+</body>
+</html>
