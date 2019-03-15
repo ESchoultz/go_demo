@@ -14,7 +14,14 @@
     </div>
     
     <div class="jumbotron">
-        <h1>Welcome {{.First}}
+        <h1>Welcome {{.First}},
+        <p>Here is the list of current books:</p>
+        {{range .}}
+        {{.Title}}
+        {{.Author}}
+        {{.Year}}
+        {{.Language}}
+        {{end}}
     </div>
 </div>
 

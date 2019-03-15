@@ -143,13 +143,13 @@ func inventory(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
-	un, ok := dbSessions[c.Value]
+	// set _ to un if uncommenting u:= dbUsers[un]
+	_, ok := dbSessions[c.Value]
 	if !ok {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
-	u := dbUsers[un]
-	tpl.ExecuteTemplate(w, "inventory.gohtml", u)
+	// u := dbUsers[un]
 
 	jsonFile, err := os.Open("inventory.json")
 	if err != nil {
@@ -158,4 +158,5 @@ func inventory(w http.ResponseWriter, req *http.Request) {
 	data, _ := ioutil.ReadAll(jsonFile)
 	var books []book
 	json.Unmarshal(data, &books)
+	tpl.ExecuteTemplate(w, "inventory.gohtml", nil)
 }
