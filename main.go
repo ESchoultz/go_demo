@@ -1,11 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"html/template"
-	"io/ioutil"
 	"net/http"
-	"os"
 
 	uuid "github.com/nu7hatch/gouuid"
 )
@@ -16,13 +13,6 @@ type user struct {
 	Password string
 	First    string
 	Last     string
-}
-
-type book struct {
-	Author   string `json:"author"`
-	Title    string `json:"title"`
-	Year     string `json:"year"`
-	Language string `json:"language"`
 }
 
 // Declarations
@@ -36,8 +26,6 @@ var u user
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
 	dbUsers["ethan@mail.com"] = user{"ethan@mail.com", "pass", "Ethan", "Schoultz"}
-	dbUsers["mason@mail.com"] = user{"mason@mail.com", "pass", "Mason", "Hill"}
-	dbUsers["cooper@mail.com"] = user{"cooper@mail.com", "pass", "Cooper", "Vasiliou"}
 }
 
 // Runs when binary is executed
@@ -106,13 +94,14 @@ func login(w http.ResponseWriter, req *http.Request) {
 // Function to handle /register get and post methods
 func register(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
-		un := req.FormValue("username")
-		p := req.FormValue("password")
-		f := req.FormValue("firstname")
-		l := req.FormValue("lastname")
-		u = user{un, p, f, l}
-		dbUsers[un] = u
-		tpl.ExecuteTemplate(w, "login.gohtml", nil)
+		var un string = req.FormValue("username")
+		var p string = req.FormValue("password")
+		var f string = req.FormValue("firstname")
+		var l string = req.FormValue("lastname")
+		// u = user{un, p, f, l}
+		//dbUsers[un] = u
+		dbUsers[un] = user{un, p, f, l}
+		http.Redirect(w, req, "/index", http.StatusSeeOther)
 		return
 	}
 	tpl.ExecuteTemplate(w, "register.gohtml", nil)
@@ -137,26 +126,5 @@ func logout(w http.ResponseWriter, req *http.Request) {
 
 // Function to handle /books get and post methods
 func inventory(w http.ResponseWriter, req *http.Request) {
-	// get cookie
-	c, err := req.Cookie("session")
-	if err != nil {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
-		return
-	}
-	// set _ to un if uncommenting u:= dbUsers[un]
-	_, ok := dbSessions[c.Value]
-	if !ok {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
-		return
-	}
-	// u := dbUsers[un]
 
-	jsonFile, err := os.Open("inventory.json")
-	if err != nil {
-		panic(err)
-	}
-	data, _ := ioutil.ReadAll(jsonFile)
-	var books []book
-	json.Unmarshal(data, &books)
-	tpl.ExecuteTemplate(w, "inventory.gohtml", nil)
 }
