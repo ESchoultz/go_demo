@@ -7,6 +7,12 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 )
 
+// Declarations
+var tpl *template.Template
+var dbUsers = map[string]user{}
+var dbSessions = map[string]string{}
+var u user
+
 // Declare user structure
 type user struct {
 	Username string
@@ -15,14 +21,7 @@ type user struct {
 	Last     string
 }
 
-// Declarations
-var tpl *template.Template
-var dbUsers = map[string]user{}
-var dbSessions = map[string]string{}
-var u user
-
 // Runs before main()
-// Sets up DB
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
 	dbUsers["ethan@mail.com"] = user{"ethan@mail.com", "pass", "Ethan", "Schoultz"}
