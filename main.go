@@ -1,12 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
+	"io/ioutil"
 	"net/http"
+	"os"
 
 	uuid "github.com/nu7hatch/gouuid"
 )
 
+// Declare user structure
 type user struct {
 	UserName string
 	Password string
@@ -14,11 +18,21 @@ type user struct {
 	Last     string
 }
 
+type book struct {
+	Author   string `json:"author"`
+	Title    string `json:"title"`
+	Year     string `json:"year"`
+	Language string `json:"language"`
+}
+
+// Declarations
 var tpl *template.Template
-var dbUsers = map[string]user{}      // user ID, user
-var dbSessions = map[string]string{} // session ID, user ID
+var dbUsers = map[string]user{}
+var dbSessions = map[string]string{}
 var u user
 
+// Runs before main()
+// Sets up DB
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
 	dbUsers["ethan@mail.com"] = user{"ethan@mail.com", "pass", "Ethan", "Schoultz"}
@@ -26,18 +40,18 @@ func init() {
 	dbUsers["cooper@mail.com"] = user{"cooper@mail.com", "pass", "Cooper", "Vasiliou"}
 }
 
+// Runs when binary is executed
 func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/register", register)
-	http.HandleFunc("/bar", bar)
+	http.HandleFunc("/inventory", inventory)
 	http.HandleFunc("/logout", logout)
-	//http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.ListenAndServe(":8080", nil)
 }
 
+// Function to handle index get and post methods
 func index(w http.ResponseWriter, req *http.Request) {
-
 	// Request cookie
 	c, err := req.Cookie("session")
 	// If no cookies exists, create one
@@ -58,23 +72,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "index.gohtml", u)
 }
 
-func bar(w http.ResponseWriter, req *http.Request) {
-
-	// get cookie
-	c, err := req.Cookie("session")
-	if err != nil {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
-		return
-	}
-	un, ok := dbSessions[c.Value]
-	if !ok {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
-		return
-	}
-	u := dbUsers[un]
-	tpl.ExecuteTemplate(w, "bar.gohtml", u)
-}
-
+// Function to handle /login get and post methods
 func login(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method == http.MethodPost {
@@ -105,10 +103,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
 
-type msg struct {
-	message string
-}
-
+// Function to handle /register get and post methods
 func register(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
@@ -117,14 +112,13 @@ func register(w http.ResponseWriter, req *http.Request) {
 		l := req.FormValue("lastname")
 		u = user{un, p, f, l}
 		dbUsers[un] = u
-		var msg msg
-		msg.message = "Please Enter Valid Credentials!"
-		tpl.ExecuteTemplate(w, "register.gohtml", msg)
+		tpl.ExecuteTemplate(w, "login.gohtml", nil)
 		return
 	}
 	tpl.ExecuteTemplate(w, "register.gohtml", nil)
 }
 
+// Function to handle /logout get and post methods
 func logout(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
@@ -139,4 +133,26 @@ func logout(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, c)
 
 	tpl.ExecuteTemplate(w, "index.gohtml", nil)
+}
+
+// Function to handle /books get and post methods
+func inventory(w http.ResponseWriter, req *http.Request) {
+	// get cookie
+	c, err := req.Cookie("session")
+	if err != nil {
+		http.Redirect(w, req, "/", http.StatusSeeOther)
+		return
+	}
+	_, ok := dbSessions[c.Value]
+	if !ok {
+		http.Redirect(w, req, "/", http.StatusSeeOther)
+		return
+	}
+
+	jsonFile, err := os.Open("inventory.json")
+	byteData, _ := ioutil.ReadAll(jsonFile)
+	var book book
+	json.Unmarshal(byteData, &book)
+	// @todo pass data to books.gohtml
+	tpl.ExecuteTemplate(w, "books.gohtml", book)
 }
