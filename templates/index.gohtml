@@ -3,17 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <title>Home Page</title>
 </head>
 <body>
 
-{{if .First}}
-Welcome {{.First}} {{.Last}}, username: {{.Username}}
-<h2>Go to <a href="/inventory">the inventory page</a></h2>
-<a href="/logout">Logout</a>
-{{else}}
-<h2>Go to <a href="/login">login page</a></h2>
-<h2>Go to <a href="/register">registration page</a></h2>
-{{end}}
+<div class="container">
+    <div class="page-header">
+        <h1>Home Page</h1>
+    </div>
+    
+    <div class="jumbotron">
+        {{if .Username}}
+            <h2>Welcome {{.First}} {{.Last}}!</h2><br>
+            <h2><a href="/inventory">Inventory Page</a></h2>
+            <a href="/logout">Logout</a>
+        {{else}}
+            <h3><a href="/login">Log In!</a></h3>
+            <h3><a href="/register">Register New Account!</a></h3>
+        {{end}}
+    </div>
+</div>
+
 </body>
 </html>

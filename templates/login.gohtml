@@ -2,28 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <title>Log In</title>
 </head>
 <body>
 
-{{if .UserName}}
-<h1>You are logged in</h1>
-USER NAME {{.UserName}}<br>
-PASSWORD {{.Password}}<br>
-FIRST {{.First}}<br>
-LAST {{.Last}}<br>
-{{else}}
-<h1>LOGIN</h1>
+<div class="container">
+    <div class="page-header">
+        <h1>Inventory</h1>
+    </div>
+    
+    <div class="jumbotron">
+        {{if .UserName}}
+            <h1>You are logged in</h1>
+            Username: {{.UserName}}<br>
+            Password: {{.Password}}<br>
+            First Name: {{.First}}<br>
+            Last Name: {{.Last}}<br>
+        {{else}}
+        <h1>LOGIN</h1>
 
-<div>
-    {{.}}
+        <div>
+            {{.}}
+        </div>
+
+        <form method="post">
+            <input type="text" name="username" placeholder="email" required>
+            <input type="password" name="password" placeholder="password" required>
+            <input type="submit">
+        </form>
+        {{end}}
+    </div>
 </div>
 
-<form method="post">
-    <input type="text" name="username" placeholder="email" required>
-    <input type="password" name="password" placeholder="password" required>
-    <input type="submit">
-</form>
-{{end}}
 </body>
 </html>

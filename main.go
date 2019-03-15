@@ -12,7 +12,7 @@ import (
 
 // Declare user structure
 type user struct {
-	UserName string
+	Username string
 	Password string
 	First    string
 	Last     string
@@ -143,16 +143,19 @@ func inventory(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
-	_, ok := dbSessions[c.Value]
+	un, ok := dbSessions[c.Value]
 	if !ok {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
+	u := dbUsers[un]
+	tpl.ExecuteTemplate(w, "inventory.gohtml", u)
 
 	jsonFile, err := os.Open("inventory.json")
-	byteData, _ := ioutil.ReadAll(jsonFile)
-	var book book
-	json.Unmarshal(byteData, &book)
-	// @todo pass data to books.gohtml
-	tpl.ExecuteTemplate(w, "books.gohtml", book)
+	if err != nil {
+		panic(err)
+	}
+	data, _ := ioutil.ReadAll(jsonFile)
+	var books []book
+	json.Unmarshal(data, &books)
 }
